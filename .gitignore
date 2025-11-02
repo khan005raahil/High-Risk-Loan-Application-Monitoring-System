@@ -1,2 +1,8 @@
 node_modules/
 dist/
+.env
+src/config/serviceAccountKey.json
+logs/
+testing-evidence/
+.vscode/
+.idea/
