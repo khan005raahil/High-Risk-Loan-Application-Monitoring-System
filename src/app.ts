@@ -1,4 +1,3 @@
-// src/app.ts
 import express from 'express';
 import morgan from 'morgan';
 import { json } from 'body-parser';
