@@ -1,4 +1,3 @@
-// src/api/v1/routes/claims.ts
 import { Router } from 'express';
 import * as controller from '../controllers/claimsController';
 import { authenticate } from '../middleware/authenticate';

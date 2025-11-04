@@ -5,6 +5,7 @@ import loansRouter from './api/v1/routes/loans';
 import { errorHandler } from './api/v1/middleware/errorHandler';
 import { loggingMiddleware } from './api/v1/middleware/logging';
 import claimsRouter from './api/v1/routes/claims';
+import testRoutes from './api/v1/routes/testRoutes';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(morgan('dev'));
 app.use(json());
 app.use(loggingMiddleware);
 app.use('/api/v1/claims', claimsRouter);
+app.use('/api/v1/test', testRoutes);
 
 // Version 1 routes
 app.use('/api/v1/loans', loansRouter);

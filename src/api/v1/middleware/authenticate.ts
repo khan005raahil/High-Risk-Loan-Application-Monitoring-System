@@ -1,18 +1,27 @@
-// src/api/v1/middleware/authenticate.ts
 import { Request, Response, NextFunction } from 'express';
-import admin from '../../../config/firebase';
-import { AuthError } from '../errors/AuthError';
+import { auth } from '../../../config/firebase';
 
-export const authenticate = async (req: Request & { user?: any }, _res: Response, next: NextFunction) => {
+export interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
+export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  const header = req.headers.authorization;
+  if (!header) {
+    return res.status(401).json({ error: 'Authorization header missing', timestamp: new Date().toISOString() });
+  }
+  const parts = header.split(' ');
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return res.status(401).json({ error: 'Malformed Authorization header', timestamp: new Date().toISOString() });
+  }
+  const token = parts[1];
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) throw new AuthError('Authorization header missing');
-    const token = authHeader.split(' ')[1];
-    if (!token) throw new AuthError('Bearer token missing');
-    const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await auth.verifyIdToken(token);
+    // decoded may have custom claims in decoded.role or decoded.firebase.claims
     req.user = decoded;
-    next();
-  } catch (err) {
-    next(new AuthError('Authentication failed'));
+    return next();
+  } catch (err: any) {
+    // Provide safe error message
+    return res.status(401).json({ error: 'Invalid or expired token', detail: err?.message, timestamp: new Date().toISOString() });
   }
 };

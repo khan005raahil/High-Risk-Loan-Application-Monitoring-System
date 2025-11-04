@@ -22,3 +22,15 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     next(err);
   }
 };
+
+// Set custom claims: admin-only endpoint should protect this with authorize(['admin'])
+export const setRole = async (req: Request, res: Response) => {
+  try {
+    const { uid, role } = req.body;
+    if (!uid || !role) return res.status(400).json({ error: 'uid and role required' });
+    await admin.auth().setCustomUserClaims(uid, { role });
+    return res.status(200).json({ message: 'Custom claim set', uid, role });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to set claims', detail: err?.message });
+  }
+};
